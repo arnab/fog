@@ -2,8 +2,8 @@ module Fog
   module AWS
     class Compute < Fog::Service
 
-      requires   :aws_access_key_id, :aws_secret_access_key
-      recognizes :endpoint, :region, :host, :path, :port, :scheme, :persistent
+      requires :aws_access_key_id, :aws_secret_access_key, &inject_parameter_specs
+      recognizes :endpoint, :region, :host, :path, :port, :scheme, :persistent, &inject_parameter_specs
 
       model_path 'fog/aws/models/compute'
       model       :address
@@ -219,7 +219,7 @@ module Fog
               :method     => 'POST',
               :parser     => parser
             })
-          rescue Excon::Errors::Error => error
+          rescue Excon::Errors::HTTPStatusError => error
             if match = error.message.match(/<Code>(.*)<\/Code><Message>(.*)<\/Message>/)
               raise case match[1].split('.').last
               when 'NotFound'

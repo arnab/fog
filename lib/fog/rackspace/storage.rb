@@ -2,7 +2,8 @@ module Fog
   module Rackspace
     class Storage < Fog::Service
 
-      requires :rackspace_api_key, :rackspace_username
+      requires :rackspace_api_key, :rackspace_username, &inject_parameter_specs
+      recognizes :rackspace_auth_url, :persistent, &inject_parameter_specs
 
       model_path 'fog/rackspace/models/storage'
       model       :directory
@@ -111,7 +112,7 @@ module Fog
               :host     => @host,
               :path     => "#{@path}/#{params[:path]}",
             }), &block)
-          rescue Excon::Errors::Error => error
+          rescue Excon::Errors::HTTPStatusError => error
             raise case error
             when Excon::Errors::NotFound
               Fog::Rackspace::Storage::NotFound.slurp(error)

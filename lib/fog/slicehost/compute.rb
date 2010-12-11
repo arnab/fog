@@ -2,7 +2,8 @@ module Fog
   module Slicehost
     class Compute < Fog::Service
 
-      requires :slicehost_password
+      requires :slicehost_password, &inject_parameter_specs
+      recognizes :host, :port, :scheme, :persistent, &inject_parameter_specs
 
       model_path 'fog/slicehost/models/compute'
       model       :flavor
@@ -73,7 +74,7 @@ module Fog
 
           begin
             response = @connection.request(params.merge!({:host => @host}))
-          rescue Excon::Errors::Error => error
+          rescue Excon::Errors::HTTPStatusError => error
             raise case error
             when Excon::Errors::NotFound
               Fog::Slicehost::Compute::NotFound.slurp(error)
